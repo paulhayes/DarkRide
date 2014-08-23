@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - effects - oculus rift</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: rgb(168, 148, 0);
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #a06851;
+			}
+
+			#oldie {
+				background:rgb(100,0,0) !important;
+				color:#fff !important;
+				margin-top:10em !important;
+			}
+			#oldie a { color:#fff }
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - oculus rift. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward, h: hide text)</div>
+
+		<script src="three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/effects/OculusRiftEffect.js"></script>
+		<script src="js/effects/StereoEffect.js"></script>	
+		<!--
+		<script src="js/controls/FirstPersonControls.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/wip/TypedGeometry.js"></script>
+		<script src="js/wip/IndexedTypedGeometry.js"></script>
+		<script src="js/wip/PlaneTypedGeometry.js"></script>
+				-->
+		<script>
+
+			if ( ! Detector.webgl ) {
+
+				Detector.addGetWebGLMessage();
+				document.getElementById( 'container' ).innerHTML = "";
+
+			}
+
+			var video      = document.createElement('video');
+			var videoTexture;
+			video.width    = 1280;
+			video.height   = 720;
+			video.autoplay = true;
+			var hasUserMedia = navigator.webkitGetUserMedia ? true : false;
+			navigator.webkitGetUserMedia({ video: true }, function(stream){
+			  video.src    = webkitURL.createObjectURL(stream);
+			}, function(error){
+			  console.log("Failed to get a stream due to", error);
+			});
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var mesh;
+
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				//camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+				//camera = new THREE.Camera();
+			
+				scene = new THREE.Scene();
+
+				// sides
+
+				var matrix = new THREE.Matrix4();
+				var texture = THREE.ImageUtils.loadTexture( '1.jpg' );
+				videoTexture = new THREE.Texture( video );
+				var backgroundMesh = new THREE.Mesh(
+	            	new THREE.PlaneGeometry(100, 100, 0),
+	            	new THREE.MeshBasicMaterial({
+	                map: videoTexture
+	            }));
+
+		        backgroundMesh .material.depthTest = false;
+		        backgroundMesh .material.depthWrite = false;
+
+				camera.rotation.y = 0 * Math.PI / 180;
+	            camera.position.z = 40;
+	            camera.position.x = 0;
+
+		        scene.add( backgroundMesh );
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				scene.add( ambientLight );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x000000, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				// Here is the effect for the Oculus Rift
+				// worldScale 100 means that 100 Units == 1m
+				effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
+				//effect = new THREE.StereoEffect( renderer );
+				//effect.separation = 1;
+				
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+				container.innerHTML = "";
+
+				container.appendChild( renderer.domElement );
+				/*
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+				*/
+
+				// GUI
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', keyPressed, false );
+
+				guiVisible = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				//camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+
+			}
+
+			function keyPressed (event) {
+				if (event.keyCode === 72) { // H
+					guiVisible = !guiVisible;
+					//document.getElementById('info').style.display = guiVisible ? "block" : "none";
+					//stats.domElement.style.display = guiVisible ? "block" : "none";
+				}
+			}
+
+			function animate() {
+				if( video.readyState === video.HAVE_ENOUGH_DATA ){
+				  videoTexture.needsUpdate = true;
+				}
+
+				requestAnimationFrame( animate );
+
+				render();
+			}
+
+			function render() {
+				//clock.getDelta() 
+				effect.render( scene, camera );
+				//renderer.render(scene,camera);
+			}
+
+		</script>
+
+	</body>
+</html>
