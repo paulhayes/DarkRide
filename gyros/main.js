@@ -11,6 +11,7 @@ var Comms = function(bsp){
 	var _channel=1;
 	var _connected=false;
 	var _name = 'GyroServo';
+	var _isReady = true;
 
 	this.init = function(){
 		_blueSerial = bsp;
@@ -43,15 +44,15 @@ var Comms = function(bsp){
 	}.bind(this);
 
 	this.onData = function(buffer){
-		console.log('ON DATA',buffer);
+		//console.log('ON DATA',buffer);
+		_isReady = true;
 	}.bind(this);
 
 	this.onError = function(e){
 		console.log('ERROR',e);
 	}.bind(this);
 
-	this.onWrite = function(err,bytes){
-		console.log('DATA WRITTEN');
+	this.onWrite = function(err,bytes){		
 		if(err){
 			this.onError(err);
 		}
@@ -67,8 +68,9 @@ var Comms = function(bsp){
 	}.bind(this);
 
 	this.move = function(pos){
-		if( _connected && (typeof pos == 'number') ){
+		if( _connected && (typeof pos == 'number') && _isReady ){
 			_blueSerial.write(new Buffer(String.fromCharCode(pos),'utf-8'),this.onWrite);
+			_isReady = false;
 		}
 	}
 	
@@ -78,4 +80,33 @@ var comms = new Comms(bsp);
 
 comms.init();
 
-setInterval(function(){ comms.move( Math.floor( Math.random()*180 ) ) },1000);
+Math.radToDeg = 180 / Math.PI ;
+
+simpleOvr.orientationY = function(){
+	var q = this.orientation();
+	return Math.atan2(2*q.y*q.w-2*q.w*q.z, 1-2*q.y*q.y - 2*q.z*q.z);
+}.bind(simpleOvr);
+
+simpleOvr.setup();
+
+Math.clamp = function(min,max,value){
+	if( value <= min ) value = min;
+	if( value >= max ) value = max;
+	return value;
+}
+
+var lastY;
+var i=0;
+
+setInterval(function(){ 
+	var y = Math.radToDeg * simpleOvr.orientationY() + 90;
+	y = Math.round( y );
+	if( y < -90 ) y+=360;
+	if( y > 270 ) y-=360;
+	y = Math.clamp( 0, 179, y );
+	if( true || y != lastY ){
+		comms.move( y );
+		lastY = y;
+		i++;
+	}
+},20);
