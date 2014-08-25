@@ -37,10 +37,11 @@
 		</style>
 	</head>
 	<body>
-
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container">
+		<!--
+		<br /><br /><br /><br /><br />Generating world...</div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - oculus rift. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward, h: hide text)</div>
-
+-->
 		<script src="three.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/effects/OculusRiftEffect.js"></script>
@@ -60,6 +61,37 @@
 				Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 
+			}
+
+			document.addEventListener('keydown', function(e) {
+			  switch (e.keyCode) {
+			    case 13: // ENTER. ESC should also take you out of fullscreen by default.
+			      e.preventDefault();
+			      document.cancelFullScreen(); // explicitly go out of fs.
+			      break;
+			    case 70: // f
+			      enterFullscreen();
+			      break;
+			  }
+			}, false);
+
+
+
+			function enterFullscreen() {
+			  console.log("enterFullscreen()");
+			  var elem = document.body;
+			  //elem.onwebkitfullscreenchange = onFullScreenEnter;
+			  //elem.onmozfullscreenchange = onFullScreenEnter;
+			  //elem.onfullscreenchange = onFullScreenEnter;
+			  if (elem.webkitRequestFullscreen) {
+			    elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+			  } else {
+			    if (elem.mozRequestFullScreen) {
+			      elem.mozRequestFullScreen();
+			    } else {
+			      elem.requestFullscreen();
+			    }
+			  }
 			}
 
 			var video      = document.createElement('video');
@@ -102,7 +134,7 @@
 				var texture = THREE.ImageUtils.loadTexture( '1.jpg' );
 				videoTexture = new THREE.Texture( video );
 				var backgroundMesh = new THREE.Mesh(
-	            	new THREE.PlaneGeometry(100, 100, 0),
+	            	new THREE.PlaneGeometry(160, 90, 0),
 	            	new THREE.MeshBasicMaterial({
 	                map: videoTexture
 	            }));
