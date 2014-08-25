@@ -21,14 +21,16 @@ void setup()
   //hwSerial.print("AT");
   
   mservo.attach(2);
+  mservo.write(position);
 }
 
 void loop()
 {
+  //position = mservo.read();
   
   if (hwSerial.available()) {
      destPosition = hwSerial.read();
-     hwSerial.write(2);
+     hwSerial.write(position);
   }
   
   int diff = destPosition - position;
@@ -38,8 +40,8 @@ void loop()
   else if( diff < 0 ){
     mservo.write( --position );
   }
-    
-  //delay(5);
+  delay(15);
+  //delay(5+(100/(1+diff)));    
 }
 
 

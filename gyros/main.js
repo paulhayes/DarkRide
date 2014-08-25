@@ -8,33 +8,49 @@ var bsp = new bluetoothSerialPort.BluetoothSerialPort();
 var Comms = function(bsp){
 	var _blueSerial = bsp;
 	var _address;
-	var _channel=1;
+	var _channel;
 	var _connected=false;
-	var _name = 'GyroServo';
+	var _name;
 	var _isReady = true;
 
-	this.init = function(){
+	this.init = function(name,address,channel){
+		_address = address;
+		_name = name;
+		_channel = channel;
 		_blueSerial = bsp;
 		_blueSerial.on('found',this.onFound);
 		_blueSerial.on('data',this.onData);
 		_blueSerial.on('failure',this.onError);
-		_blueSerial.on('finished',this.onInquireComplete)
-		_blueSerial.inquire();
+		_blueSerial.on('finished',this.onInquireComplete);
+		
 	}.bind(this);
+
+	this.connect = function(){
+		if( _address  ){
+			if(typeof(_channel)=="number"){
+				_blueSerial.connect(_address,_channel,this.onConnect);
+			}
+			else {
+				//if(_address)_blueSerial.findSerialPortChannel(_address,this.onChannelFound,this.onError);
+			}
+		}else {
+			_blueSerial.inquire();
+		}
+	}
 
 	this.onFound = function(address,name){
 		console.log('DEVICE FOUND ',name);
 		if(name==_name){
-			console.log('CONNECTING ',name);
-			console.log( this.onChannelFound );
+			console.log('CONNECTING TO: ',name,address);
 			_address=address;
+			this.connect();
 		}
 	}.bind(this);
 
 	this.onChannelFound = function(channel){
 		console.log("CHANNEL FOUND");
 		_channel = channel;
-		_blueSerial.connect(_address,_channel,this.onConnect);
+		this.connect();
 	}.bind(this)
 
 	this.onConnect = function(){
@@ -45,6 +61,7 @@ var Comms = function(bsp){
 
 	this.onData = function(buffer){
 		//console.log('ON DATA',buffer);
+		console.log(buffer);
 		_isReady = true;
 	}.bind(this);
 
@@ -60,9 +77,8 @@ var Comms = function(bsp){
 
 	this.onInquireComplete = function(){
 		console.log('INQUIRE COMPLETE');
-		//if(_address)_blueSerial.findSerialPortChannel(_address,this.onChannelFound,this.onError);
 		if(_address){
-			_blueSerial.connect(_address,_channel,this.onConnect);
+			
 		}
 		else throw new Error("Device not found");
 	}.bind(this);
@@ -78,7 +94,8 @@ var Comms = function(bsp){
 
 var comms = new Comms(bsp);
 
-comms.init();
+comms.init('GyroServo','ad-cd-ee-fd-ff-78',1);
+comms.connect();
 
 Math.radToDeg = 180 / Math.PI ;
 
@@ -103,7 +120,7 @@ setInterval(function(){
 	y = Math.round( y );
 	if( y < -90 ) y+=360;
 	if( y > 270 ) y-=360;
-	y = Math.clamp( 0, 179, y );
+	y = Math.clamp( 0, 175, y );
 	if( true || y != lastY ){
 		comms.move( y );
 		lastY = y;
