@@ -7,15 +7,15 @@
 
 unsigned long minPossibleLapTime = 40000;
 unsigned long baseLapTime = 86200;
-unsigned long defaultLapTime = 86200;
+unsigned long defaultLapTime = 94800;
 
 unsigned long c1 = 30+250;
 unsigned long c2 = 5760+250;
 unsigned long c3 = 14120;
-unsigned long c4 = 32280;
+unsigned long c4 = 32280+500;
 unsigned long c5 = 47440;
 unsigned long c6 = 59440;
-unsigned long c7 = 77200+2000;
+unsigned long c7 = 77200+1500;
 
 elapsedMillis timeElapsed; 
 unsigned long currentFrameTime;
