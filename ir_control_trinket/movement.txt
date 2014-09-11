@@ -1,0 +1,8 @@
+1 00000 turn 90 Left
+2 05760 center
+3 14120 turn 90 Right
+4 32280 turn 90 Left
+5 47440 centre
+6 59440 turn 90 Right
+7 77200 centre
+8 86440 lap

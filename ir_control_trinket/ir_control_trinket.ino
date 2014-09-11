@@ -1,59 +1,124 @@
 #include <PowerFunctions.h>
 #include <elapsedMillis.h>
 
-elapsedMillis timeElapsed; 
-int lastLapTime;
-int lastElapsedTime;
+#define ledPin 0
+#define detectorPin 2
+#define resetPin 1
 
-int ledPin = 0;
-int detectorPin = 2;
+unsigned long baseLapTime = 86200;
+unsigned long c1 = 30+250;
+unsigned long c2 = 5760+250;
+unsigned long c3 = 14120;
+unsigned long c4 = 32280;
+unsigned long c5 = 47440;
+unsigned long c6 = 59440;
+unsigned long c7 = 77200+1000;
+
+byte m1 = PWM_REV6;
+byte m2 = PWM_BRK;
+byte m3 = PWM_FWD6;
+byte m4 = PWM_REV6;
+byte m5 = PWM_BRK;
+byte m6 = PWM_FWD6;
+byte m7 = PWM_BRK;
+
+
+elapsedMillis timeElapsed; 
+unsigned long currentFrameTime;
+unsigned long lastLapTime;
+unsigned long lastFrameTime;
+
+byte TURN = BLUE;
+
+bool startMode = true;
+
 bool wasOn;
 
 PowerFunctions pf(ledPin, 0);
 
 void setup(){
   pinMode(detectorPin, INPUT );
-  lastLapTime = 150000;
+  lastLapTime = baseLapTime;
 }
 
-bool IsPassedTime(int time){
-  return ( lastElapsedTime < time ) && ( time < timeElapsed );
+bool HasCrossedTime(unsigned long time){
+  return ( lastFrameTime < time ) && ( time <= currentFrameTime );
 }
 
 void loop(){
-  digitalTest();
+  lastFrameTime = currentFrameTime;
+  currentFrameTime = timeElapsed;
   
-  
-  if( IsPassedTime(1000) ){
-      pf.single_pwm(RED,PWM_REV6);
-      delay(500);
+  if( digitalRead(resetPin) ){
+    startMode = true;
   }
-  if( IsPassedTime(5000) ){
-      pf.single_pwm(RED,PWM_FWD6);
-      delay(500);
+
+  if( CheckLapStart() || startMode ){
+    delay(10);
+    return;
+  }
+      
+  if( HasCrossedTime(c1) ){
+      pf.single_pwm(TURN,m1);
+  }
+  if( HasCrossedTime(c2) ){
+      pf.single_pwm(TURN,m2);
   }
   
-  lastElapsedTime = timeElapsed;
-  
+  if( HasCrossedTime(c3) ){
+      pf.single_pwm(TURN,m3);
+  }
+ 
+  if( HasCrossedTime(c4) ){
+      pf.single_pwm(TURN,m4);
+  }
+ 
+  if( HasCrossedTime(c5) ){
+      pf.single_pwm(TURN,m5);
+  }
+ 
+  if( HasCrossedTime(c6) ){
+      pf.single_pwm(TURN,m6);
+  }
+ 
+  if( HasCrossedTime(c7) ){
+      pf.single_pwm(TURN,m7);
+  }
+ 
+   delay(10); 
 }
 
-void digitalTest(){
+unsigned long lapCompensate(unsigned long time){
+  return time * lastLapTime / baseLapTime;
+}
+
+bool CheckLapStart(){
   bool isOn = digitalRead(detectorPin);
-  if( isOn != wasOn && timeElapsed > 1000 ){
+  bool bouncePrevention = timeElapsed > 1000;
+  if( isOn != wasOn && bouncePrevention ){
     wasOn = isOn;
     if( isOn ){
     }
     else {
       LapStarted();      
+      return true;
     }
     
   }
+  return false;
   
 }
 
 void LapStarted(){
-  lastLapTime = timeElapsed;
-  lastElapsedTime = timeElapsed = 0;
+  if( !startMode ){
+    lastLapTime = timeElapsed;
+  }
+  else{
+    lastLapTime = baseLapTime;
+  }
   
-  pf.single_pwm(RED,PWM_BRK);
+  startMode = false;
+  currentFrameTime = lastFrameTime = timeElapsed = 0;
+  
+  pf.single_pwm(TURN,PWM_BRK);
 }
