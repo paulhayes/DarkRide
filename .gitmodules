@@ -1,0 +1,9 @@
+[submodule "libraries/elapsedMillis"]
+	path = libraries/elapsedMillis
+	url = git@github.com:pfeerick/elapsedMillis.git
+[submodule "libraries/Arduino-PowerFunctions"]
+	path = libraries/Arduino-PowerFunctions
+	url = git@github.com:paulhayes/Arduino-PowerFunctions.git
+[submodule "libraries/Adafruit_NeoPixel"]
+	path = libraries/Adafruit_NeoPixel
+	url = https://github.com/adafruit/Adafruit_NeoPixel.git
