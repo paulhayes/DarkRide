@@ -116,12 +116,12 @@ void move7(){
 
 void fullLeft(){
       pf.single_pwm(TURN,PWM_REV6);
-      pf.single_increment(TURN,false);
+      pf.single_decrement(TURN);
 }
 
 void fullRight(){
       pf.single_pwm(TURN,PWM_FWD6);
-      pf.single_increment(TURN,true);
+      pf.single_increment(TURN);
 }
 
 unsigned long LapCompensate(unsigned long time){
