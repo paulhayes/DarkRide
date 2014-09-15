@@ -139,12 +139,13 @@
     }
 
     function onWindowResize() {
-
         camera.aspect = window.innerWidth / window.innerHeight;
-        //camera.updateProjectionMatrix();
-
+        renderer.setSize( window.innerWidth, window.innerHeight );
         effect.setSize( window.innerWidth, window.innerHeight );
+        //effect.setSize( window.innerWidth, window.innerHeight );
 
+        camera.updateProjectionMatrix();
+        
 
     }
 
@@ -177,8 +178,7 @@
     // Event listeners
     function onKeyDown(event){
         console.log("onKeyDown");
-        console.log(event.keyCode);
-
+        
         var curvatureMutliplier = 1.05;
         var curavatureReciprocal = 1 / curvatureMutliplier;
 
@@ -202,7 +202,6 @@
 
 
     function enterFullscreen() {
-        console.log("enterFullscreen()");
         var elem = document.body;
         //elem.onwebkitfullscreenchange = onFullScreenEnter;
         //elem.onmozfullscreenchange = onFullScreenEnter;
