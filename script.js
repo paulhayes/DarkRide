@@ -38,8 +38,8 @@
         },
 
         uniforms =  {
-            curvature : { type: "v2", value: new THREE.Vector2(1,0.5625) },
-            curvatureScale : { type: "f", value: 50 }
+            curvature : { type: "v2", value: new THREE.Vector2(0.710681330130121,0.39975824819819306    ) },
+            curvatureScale : { type: "f", value: 87 }
         },
         // update uniforms from localStorage
     // fullscreen toggle
