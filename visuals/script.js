@@ -53,14 +53,31 @@
 
     retrieveUniformsLocally();
 
-    navigator.webkitGetUserMedia({ video: true, audio: true }, function(stream){
-        video.src    = webkitURL.createObjectURL(stream);
-    }, function(error){
-        console.log("Failed to get a stream due to", error);
-    });
+    if(window.videoToLoad){
+        video.src = window.videoToLoad;
+
+        if (typeof video.loop == 'boolean') { // loop supported
+          video.loop = true;
+        } else { // loop property not supported
+            video.addEventListener('ended', function () {
+            this.currentTime = 0;
+            this.play();
+          }, false);
+        }
+
+    }else {
+        navigator.webkitGetUserMedia({ video: true, audio: true }, function(stream){
+            video.src    = webkitURL.createObjectURL(stream);
+        }, function(error){
+            console.log("Failed to get a stream due to", error);
+        });
+        
+    }
+
     video.width    = 1280;
     video.height   = 720;
     video.autoplay = true;
+
     
     init();
     animate();

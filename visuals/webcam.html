@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - effects - oculus rift</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: rgb(168, 148, 0);
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #a06851;
+			}
+
+			#oldie {
+				background:rgb(100,0,0) !important;
+				color:#fff !important;
+				margin-top:10em !important;
+			}
+			#oldie a { color:#fff }
+
+		</style>
+		 <script type="x-shader/x-vertex" id="vertexShader">
+		 	varying vec2 vUv;
+		    uniform vec2 curvature;
+		    uniform float curvatureScale;
+
+
+			void main() {
+
+			    vUv = uv;
+			    vec2 pos = float(2.0) * ( uv - vec2(0.5,0.5) ); 
+
+			    vec3 newPosition = vec3(1,1,0)*position + normal * curvatureScale * ( float(2) - sqrt( float(2) - ( curvature.x * pos.x * pos.x ) - (curvature.y * pos.y * pos.y) ) );
+			    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+			}
+	    </script>
+
+	    <script type="x-shader/x-vertex" id="fragmentShader">
+		    uniform sampler2D texture1;
+
+		    varying vec2 vUv;
+
+		    void main() {
+		        gl_FragColor = texture2D(texture1, vUv); // Displays Nothing
+		        //gl_FragColor = vec4(0.5, 0.2, 1.0, 1.0); // Works; Displays Flat Color
+		    }
+	    </script>
+	</head>
+	<body>
+		<div id="container">
+		<!--
+		<br /><br /><br /><br /><br />Generating world...</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - oculus rift. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward, h: hide text)</div>
+-->
+		<script src="three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/effects/OculusRiftEffect.js"></script>
+		<script src="js/effects/StereoEffect.js"></script>	
+		<!--
+		<script src="js/controls/FirstPersonControls.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/wip/TypedGeometry.js"></script>
+		<script src="js/wip/IndexedTypedGeometry.js"></script>
+		<script src="js/wip/PlaneTypedGeometry.js"></script>
+				-->
+		<script src='script.js'></script>
+
+	</body>
+</html>
