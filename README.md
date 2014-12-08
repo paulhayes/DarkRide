@@ -11,4 +11,5 @@ A beautiful edit of the DarkRide event:
 http://www.lucyirving.com/portfolios/dark-ride/
 
 You can watch a recording of the Rift view from here:
+
 [http://paulhayes.github.io/DarkRide](http://paulhayes.github.io/DarkRide)
